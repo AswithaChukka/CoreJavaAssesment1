@@ -2,6 +2,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.TreeMap;
+import java.util.LinkedHashMap;
 
 public class StreamCollectorsExercise {
     public static void main(String[] args) {
@@ -11,8 +13,11 @@ public class StreamCollectorsExercise {
                 new Player("Manu",200,25000,600,"India"),
                 new Player("Ram",100,22000,350,"India"));
         getPlayersByCountry(player);
+        getPlayerNamesByCountry(player);
         getTotalPlayersByCountry(player);
         getTotalRunsByCountry(player);
+        getMaxScoreByCountry(player);
+        getPlayerNamesStringByCountry(player);
     }
     public static void getPlayersByCountry(List<Player> p){
         Map<Object, Object> countryNameWithPlayerName = p.stream().collect(Collectors.toMap(p1->p1.getPlayerName(), p1->p1.getCountry()));
@@ -29,8 +34,16 @@ public class StreamCollectorsExercise {
         System.out.println(n3);
     }
     public static void getMaxScoreByCountry(List<Player> p) {
-        //Map<String, Integer>  n4 = p.stream().collect(Collectors.groupingBy(k -> k.getCountry() , Collectors.max(Comparator.comparing(Player::getRuns()).get()));
-        //System.out.println(n4);
+        Map<Object, Object> highest = p.stream()
+                .collect(Collectors.groupingBy(Player::getCountry, Collectors.groupingBy(Player::getRuns,TreeMap::new, Collectors.toList())))
+                .entrySet().stream()
+                .collect(Collectors.toMap(e -> e.getKey(),
+                        e -> e.getValue().lastEntry().getKey()));
+        System.out.println(highest);
 
+    }
+    public static void getPlayerNamesStringByCountry(List<Player> p){
+        Map<Object, Object> countryNameWithPlayerName = p.stream().collect(Collectors.toMap(p1->p1.getCountry(),p1->p1.getPlayerName(), (s, a) -> s + ", " + a, LinkedHashMap::new));
+        System.out.println(countryNameWithPlayerName);
     }
 }
